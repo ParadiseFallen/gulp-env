@@ -63,22 +63,7 @@ async function buildHtml()
         .pipe(browserSync.stream())
 }
 
-task('test',()=>{
-    phpServer.server({
-        base: './../test-app/public',
-        hostname: '127.0.0.1',
-        port : 10330,
-        open : false,
-        // bin: '', // ?    path to php folder (if multiple versions)
-        // ini : '', // ?   path to php ini file
-    },()=>{
-        browserSync({
-            proxy: '127.0.0.1:8000'
-        })
-    })
-})
-
-// * Build development 
+// * Build development
 task('build-pages',()=> buildHtml())
 
 task('build-styles', () =>
