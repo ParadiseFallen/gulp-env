@@ -1,7 +1,7 @@
 //#region imports
 //* https://webdesign-master.ru/blog/docs/gulp-documentation.html
 //* filemap for project
-import config from './gulpconfig.js'
+import config, {projectPreset as preset} from './gulpconfig.js'
 
 const fileMap = config.fileMap
 // import serverInit from '../trash/serverInit.js'
@@ -16,7 +16,6 @@ import minifyHtml from 'gulp-htmlmin'
 import sass from 'gulp-sass'
 import autoPrefixer from 'gulp-autoprefixer'
 import mediaGroup from 'crlab-gulp-combine-media-queries'
-
 import cleanCss from 'gulp-clean-css'
 import stripComments from 'gulp-strip-comments'
 import clean from 'gulp-clean'
@@ -25,17 +24,20 @@ import rename from 'gulp-rename'
 import gulpIf from 'gulp-if'
 import browserSync from 'browser-sync'
 
+const argv = yargs(process.argv).options({
+    'release' :
+    {
+        default: 'false',
+        describe: 'Set release build (minify all files)',
+        type: 'bool'
+    }
+}).argv
 
 const { src, dest, task, parallel, series, watch } = gulp
 
-const lastArgument = process.argv[process.argv.length - 1];
-const isReleaseBuild = lastArgument == '-r' || lastArgument == '-release'
-console.log(`\tIs release build : ${isReleaseBuild}. To enable add -r or -release \n\tas last flag`)
+const isReleaseBuild = argv.release
 
 //#endregion
-
-console.log(yargs.test)
-
 
 //#region  TASKS
 
@@ -59,7 +61,7 @@ async function buildHtml()
         }))
         .pipe(stripComments())
         .pipe(gulpIf(isReleaseBuild, minifyHtml()))
-        .pipe(dest(`${fileMap.build.pages}/`))
+        .pipe(dest(`${fileMap.build.pages}`))
         .pipe(browserSync.stream())
 }
 
@@ -113,7 +115,6 @@ task('build-fonts', () =>
 
 task('build-resources', (done)=>{
     src(`${fileMap.src.resources}/**/*.*`, { allowEmpty: true }).pipe(dest(fileMap.build.resources))
-    // src(`${fileMap.src.folder}/.htaccess`, { allowEmpty: true }).pipe(dest(fileMap.build.folder))
     done()
 })
 task('default', parallel('build-resources', 'build-styles', 'build-pages', 'build-scripts', 'build-img', 'build-fonts'))
@@ -148,41 +149,46 @@ task('live-server', ()=>{
     config.browserSync[config.serverType]()
 })
 
+task('watch-laravel-view', () => {
+    // config.browserSync[config.serverType]()
+    watch()
+})
+
 // * Watch full project
 task('watch', series('default', parallel('live-server', 'watch-styles', 'watch-pages', 'watch-scripts', 'watch-img', 'watch-resources')))
 
 
 //#endregion
 
-//#region Clean
+// //#region Clean
 
-task('clean-pages', () =>
-    src(`${fileMap.build.pages}/**/*`)
-        .pipe(clean()))
+// task('clean-pages', () =>
+//     src(`${fileMap.build.pages}/**/*`)
+//         .pipe(clean()))
 
-task('clean-styles', () =>
-    src(`${fileMap.build.styles}/**/*`)
-        .pipe(clean()))
+// task('clean-styles', () =>
+//     src(`${fileMap.build.styles}/**/*`)
+//         .pipe(clean()))
 
-task('clean-scripts', () =>
-    src(`${fileMap.build.scripts}/**/*`)
-        .pipe(clean()))
+// task('clean-scripts', () =>
+//     src(`${fileMap.build.scripts}/**/*`)
+//         .pipe(clean()))
 
-task('clean-fonts', () =>
-    src(`${fileMap.build.fonts}/**/*`)
-        .pipe(clean()))
+// task('clean-fonts', () =>
+//     src(`${fileMap.build.fonts}/**/*`)
+//         .pipe(clean()))
 
-task('clean-img', () =>
-    src(`${fileMap.build.img}/**/*`)
-        .pipe(clean()))
+// task('clean-img', () =>
+//     src(`${fileMap.build.img}/**/*`)
+//         .pipe(clean()))
 
-task('clean-all', () =>
-    src(`${fileMap.build.folder}/*`)
-        .pipe(clean()))
+// task('clean-all', () =>
+//     src(`${fileMap.build.folder}/*`)
+//         .pipe(clean()))
 
-//#endregion
+// //#endregion
 
-task('rebuild-all', series('clean-all', 'default'))
+// task('rebuild-all', series('clean-all', 'default'))
 
 
 //#endregion

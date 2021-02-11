@@ -1,9 +1,14 @@
 const projectName = 'unknown'
-const projectPath = './..'                                 //* path to project
-const srcFolder = `${projectPath}/resources`                          //* src folder
+const projectPreset = 'laravel'                                       // * 'laravel' | 'self-hosted' | 'static'
+const projectPath = './..'                                            // * path to project
+const srcFolder = `${projectPath}/resources`                          // * src folder
 const buildFolder = `${projectPath}/public`
 import browserSync from 'browser-sync'
 import phpServer from 'gulp-connect-php'
+
+
+
+
 
 
 const fileMap = {
@@ -29,9 +34,13 @@ const fileMap = {
     "public": `./../public`
 }
 
+const laravelPreset = {
+    "fileMap" : fileMap
+}
+
 export default
     {
-        fileMap,
+        "fileMap": fileMap,
         "serverType": "live",
         // * https://browsersync.io/docs/options
         "browserSync" :
@@ -80,3 +89,4 @@ export default
 
 
     }
+export { projectPreset, projectName }
